@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 埋め込み動画</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        iframe {
+            margin-top: 20px;
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>YouTube動画埋め込み</h1>
+
+    <label for="videoUrl">YouTube動画IDまたはURLを入力してください:</label><br>
+    <input type="text" id="videoUrl" placeholder="動画URLまたはID"><br><br>
+    <button onclick="embedVideo()">動画を埋め込む</button>
+
+    <div id="videoContainer"></div>
+
+    <script>
+        function embedVideo() {
+            const urlInput = document.getElementById('videoUrl').value;
+            const videoContainer = document.getElementById('videoContainer');
+            
+            // 動画IDを取得する関数
+            function getVideoId(url) {
+                const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|\S+\/\S*\/\S*\/?)|(?:youtu\.be\/))([^?&\/\s]+)/;
+                const match = url.match(regex);
+                if (match && match[1]) {
+                    return match[1];
+                }
+                return url; // URLがIDと一致している場合、そのまま返す
+            }
+
+            // 入力が動画URLの場合、IDを取得
+            const videoId = getVideoId(urlInput);
+
+            // 動画IDが空でないかチェック
+            if (videoId) {
+                const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                const iframe = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                videoContainer.innerHTML = iframe;
+            } else {
+                videoContainer.innerHTML = '<p>有効なYouTubeの動画IDまたはURLを入力してください。</p>';
+            }
+        }
+    </script>
+
+</body>
+</html>
