@@ -3,60 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube 埋め込み動画</title>
+    <title>YouTube動画検索</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
             padding: 20px;
+            display: flex;
         }
-        input, button {
-            padding: 10px;
-            font-size: 16px;
+        #videoContainer {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 500px;
+        }
+        #searchResults {
+            width: 300px;
+            margin-left: 20px;
+            overflow-y: auto;
         }
         iframe {
-            margin-top: 20px;
             width: 100%;
-            height: 500px;
+            height: 100%;
             border: none;
+        }
+        .video-item {
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .video-item img {
+            width: 100%;
+        }
+        .video-item p {
+            margin-top: 5px;
+            font-size: 14px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <h1>YouTube動画埋め込み</h1>
+    <div id="videoContainer">
+        <iframe id="videoPlayer" src="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
 
-    <label for="videoUrl">YouTube動画IDまたはURLを入力してください:</label><br>
-    <input type="text" id="videoUrl" placeholder="動画URLまたはID"><br><br>
-    <button onclick="embedVideo()">動画を埋め込む</button>
-
-    <div id="videoContainer"></div>
+    <div id="searchResults">
+        <input type="text" id="searchQuery" placeholder="動画IDまたはURLを入力" style="width: 100%; padding: 10px; font-size: 16px;">
+        <button onclick="playVideoFromInput()" style="width: 100%; padding: 10px; margin-top: 10px;">動画を埋め込む</button>
+        <div id="resultsList"></div>
+    </div>
 
     <script>
-        function embedVideo() {
-            const urlInput = document.getElementById('videoUrl').value;
+        // 手動でIDを埋め込む機能
+        function playVideoFromInput() {
+            const query = document.getElementById('searchQuery').value.trim();
             const videoContainer = document.getElementById('videoContainer');
-            
-            // 動画IDを取得する関数
-            function getVideoId(url) {
-                const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|\S+\/\S*\/\S*\/?)|(?:youtu\.be\/))([^?&\/\s]+)/;
-                const match = url.match(regex);
+            const videoPlayer = document.getElementById('videoPlayer');
+
+            // YouTubeのURLまたはIDが入力されているかチェック
+            if (query) {
+                let videoId = query;
+
+                // YouTubeのURLが入力された場合、IDを抽出する
+                const urlPattern = /(?:https?:\/\/(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|e\/|.*?\/))([^&?\/\s]+)/;
+                const match = query.match(urlPattern);
                 if (match && match[1]) {
-                    return match[1];
+                    videoId = match[1];
                 }
-                return url; // URLがIDと一致している場合、そのまま返す
-            }
 
-            // 入力が動画URLの場合、IDを取得
-            const videoId = getVideoId(urlInput);
-
-            // 動画IDが空でないかチェック
-            if (videoId) {
+                // 動画IDを使って埋め込みURLを生成
                 const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                const iframe = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-                videoContainer.innerHTML = iframe;
+                videoPlayer.src = embedUrl;
             } else {
-                videoContainer.innerHTML = '<p>有効なYouTubeの動画IDまたはURLを入力してください。</p>';
+                alert("動画IDまたはURLを入力してください");
             }
         }
     </script>
